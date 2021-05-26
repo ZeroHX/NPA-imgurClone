@@ -64,18 +64,20 @@ resource "aws_subnet" "subnet" {
   tags = merge(local.common_tags, { Name = "${var.project_tag}-subnet${count.index + 1}" })
 
 }
+
 resource "aws_db_instance" "default" {
   allocated_storage    = 10
   engine               = "mysql"
   engine_version       = "5.7"
   instance_class       = "db.t3.micro"
   name                 = "mydb"
-  username             = "foo"
-  password             = "foobarbaz"
+  username             = "root"
+  password             = "admin1234"
   parameter_group_name = "default.mysql5.7"
   skip_final_snapshot  = true
   publicly_accessible = true
   tags = merge(local.common_tags, { Name = "${var.project_tag}-rds"})
+  identifier = "rds1"
 }
 # ROUTING #
 resource "aws_route_table" "rtb" {
@@ -96,15 +98,15 @@ resource "aws_route_table_association" "rta-subnet" {
 }
 
 # SECURITY GROUPS #
-# Default Security-Group ยังตั้งไม่ได้ #
+
 resource "aws_default_security_group" "default" {
   vpc_id = aws_vpc.vpc.id
 
   ingress {
     protocol  = -1
-    self      = true
     from_port = 0
     to_port   = 0
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -116,7 +118,7 @@ resource "aws_default_security_group" "default" {
 }
 
 resource "aws_security_group" "elb-sg" {
-  name   = "nginx_elb_sg"
+  name   = "ec2_elb_sg"
   vpc_id = aws_vpc.vpc.id
 
   #Allow HTTP from anywhere
@@ -138,9 +140,9 @@ resource "aws_security_group" "elb-sg" {
   tags = merge(local.common_tags, { Name = "${var.project_tag}-elb-sg" })
 }
 
-# Nginx security group 
-resource "aws_security_group" "nginx-sg" {
-  name   = "nginx_sg"
+# ec2 security group 
+resource "aws_security_group" "ec2-sg" {
+  name   = "ec2_sg"
   vpc_id = aws_vpc.vpc.id
 
   # SSH access from anywhere
@@ -167,18 +169,17 @@ resource "aws_security_group" "nginx-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.common_tags, { Name = "${var.project_tag}-nginx-sg" })
+  tags = merge(local.common_tags, { Name = "${var.project_tag}-ec2-sg" })
 }
-
 
 
 # LOAD BALANCER #
 resource "aws_elb" "web" {
-  name = "${var.project_tag}-nginx-elb"
+  name = "${var.project_tag}-ec2-elb"
 
   subnets         = aws_subnet.subnet[*].id
   security_groups = [aws_security_group.elb-sg.id]
-  instances       = aws_instance.nginx[*].id
+  instances       = aws_instance.ec2[*].id
 
   listener {
     instance_port     = 80
@@ -191,12 +192,12 @@ resource "aws_elb" "web" {
 }
 
 # INSTANCES #
-resource "aws_instance" "nginx" {
+resource "aws_instance" "ec2" {
   count                  = var.instance_count[terraform.workspace]
   ami                    = data.aws_ami.aws-linux.id
   instance_type          = var.instance_size[terraform.workspace]
   subnet_id              = aws_subnet.subnet[count.index % var.subnet_count[terraform.workspace]].id
-  vpc_security_group_ids = [aws_security_group.nginx-sg.id]
+  vpc_security_group_ids = [aws_security_group.ec2-sg.id]
   key_name               = var.key_name
 
   connection {
@@ -209,11 +210,11 @@ resource "aws_instance" "nginx" {
 
   # provisioner "remote-exec" {
   #   inline = [
-  #     "sudo yum install nginx -y",
-  #     "sudo service nginx start",
+  #     "sudo yum install ec2 -y",
+  #     "sudo service ec2 start",
   #     "ls"
   #   ]
   # }
 
-  tags = merge(local.common_tags, { Name = "${var.project_tag}-nginx${count.index}" })
+  tags = merge(local.common_tags, { Name = "${var.project_tag}-ec2${count.index}" })
 }

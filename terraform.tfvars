@@ -1,7 +1,7 @@
 # IAM Access and Secret Key for your IAM user
-aws_access_key = "AKIA3VYQKKAWBAULWOV7"
+aws_access_key = "AKIASX6M5LYCRFMJ3PG3"
 
-aws_secret_key = "arj48xPOZcnzlt72Pf6L+nCRBI7zvEM8r2X+xlx1"
+aws_secret_key = "gbDrH8UuFcp0AbDPgkI62H+gxztnAcwfgY0Xy5t3"
 
 key_name = "vockey"
 
