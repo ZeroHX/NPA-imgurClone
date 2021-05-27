@@ -1,7 +1,7 @@
 # IAM Access and Secret Key for your IAM user
-aws_access_key = "AKIASX6M5LYCRFMJ3PG3"
+aws_access_key = "AKIASX6M5LYC6KUQQ6EQ"
 
-aws_secret_key = "gbDrH8UuFcp0AbDPgkI62H+gxztnAcwfgY0Xy5t3"
+aws_secret_key = "Q/AGpe5AAA43BfALicQJxwAG8/xnnq3fDcFcpWbP"
 
 key_name = "vockey"
 
@@ -9,7 +9,7 @@ key_name = "vockey"
 # Local path to pem file for key pair. 
 # Windows paths need to use double-backslash: Ex. C:\\Users\\Ned\\Pluralsight.pem
 # private_key_path = "labsuser.pem" 
-private_key_path = ".\\labsuser2.pem" 
+private_key_path = ".\\labsuser.pem" 
 
 # Prefix value to be used for S3 bucket. You can leave this value as-is
 bucket_name_prefix = "glob"

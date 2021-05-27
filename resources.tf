@@ -61,7 +61,7 @@ resource "aws_subnet" "subnet" {
   map_public_ip_on_launch = true
   availability_zone       = data.aws_availability_zones.available.names[count.index]
 
-  tags = merge(local.common_tags, { Name = "${var.project_tag}-subnet${count.index + 1}" })
+  tags = merge(local.common_tags, { Name = "${var.project_tag}-subnet-${count.index}" })
 
 }
 
@@ -210,11 +210,11 @@ resource "aws_instance" "ec2" {
 
   # provisioner "remote-exec" {
   #   inline = [
-  #     "sudo yum install ec2 -y",
-  #     "sudo service ec2 start",
+  #     "sudo yum install nginx -y",
+  #     "sudo service nginx start",
   #     "ls"
   #   ]
   # }
 
-  tags = merge(local.common_tags, { Name = "${var.project_tag}-ec2${count.index}" })
+  tags = merge(local.common_tags, { Name = "${var.project_tag}-ec2-${count.index}" })
 }
